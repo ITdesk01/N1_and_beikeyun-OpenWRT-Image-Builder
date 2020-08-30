@@ -1,10 +1,17 @@
 #!/bin/bash
 
+#颜色调整参考wen55333
+red="\033[31m"
+green="\033[32m"
+yellow="\033[33m"
+white="\033[0m"
+
 #初始文件创建
 WORK_DIR="${PWD}/tmp"
 if [ ! -d ${WORK_DIR} ];then
 	mkdir -p ${WORK_DIR}
-	mkdir -p ${PWD}/image
+else
+	sudo rm -rf ${PWD}/tmp/*
 fi
 
 # 源镜像文件
@@ -13,7 +20,7 @@ fi
 #KERNEL_VERSION="5.7.15-flippy-41+"
 SUBVER=$1
 # Armbian
-LNX_IMG="${PWD}/image/armbian.img"
+LNX_IMG="${PWD}/armbian.img"
 # Openwrt 
 OPWRT_ROOTFS_GZ="${PWD}/openwrt-armvirt-64-default-rootfs.tar.gz"
 
@@ -79,14 +86,15 @@ if [ ! -f "$OPWRT_ROOTFS_GZ" ];then
 fi
 
 #安装依赖
+echo -e "$green >>安装依赖$white"
 sudo apt update
 sudo apt install btrfs-progs dosfstools uuid-runtime mount util-linux -y
 
-
+clear
 echo " -----------------------------"
-echo "请输入armbian的内核版本"
-echo "例子：Armbian_20.02.0_Aml-s9xxx_buster_5.7.15-flippy-41+.img "
-echo "其中5.7.15就是内核版本，flippy-41+是修改者的名字，你可以直接输5.7.15-flippy-41+"
+echo -e "$green请输入armbian的内核版本$white"
+echo -e "$yellow例子：Armbian_20.02.0_Aml-s9xxx_buster_5.7.15-flippy-41+.img$white "
+echo -e "$yellow其中5.7.15就是内核版本，flippy-41+是修改者的名字，你可以直接输5.7.15-flippy-41+$white"
 echo "-----------------------------"
 
 read  -p "请在这里输入内核版本：" KERNEL_VERSION
