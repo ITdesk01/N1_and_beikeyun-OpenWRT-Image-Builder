@@ -78,40 +78,10 @@ if [ ! -f "$OPWRT_ROOTFS_GZ" ];then
 	exit 1
 fi
 
-if mkfs.btrfs -V >/dev/null;then
-	echo "check mkfs.btrfs ok"
-else
-	echo "mkfs.btrfs 程序不存在，请安装 btrfsprogs"
-	exit 1
-fi
+#安装依赖
+sudo apt update
+sudo apt install btrfs-progs dosfstools uuid-runtime mount util-linux -y
 
-if mkfs.vfat --help 1>/dev/nul 2>&1;then
-	echo "check mkfs.vfat ok"
-else
-	echo "mkfs.vfat 程序不存在，请安装 dosfstools"
-	exit 1
-fi
-
-if uuidgen>/dev/null;then
-	echo "check uuidgen ok"
-else
-	echo "uuidgen 程序不存在，请安装 uuid-runtime"
-	exit 1
-fi
-
-if losetup -V >/dev/null;then
-	echo "check losetup ok"
-else
-	echo "losetup 程序不存在，请安装 mount"
-	exit 1
-fi
-
-if lsblk --version >/dev/null 2>&1;then
-	echo "check lsblk ok"
-else
-	echo "lsblk 程序不存在，请安装 util-linux"
-	exit 1
-fi
 
 echo " -----------------------------"
 echo "请输入armbian的内核版本"
