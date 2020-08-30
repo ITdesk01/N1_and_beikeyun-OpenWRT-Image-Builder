@@ -1,17 +1,19 @@
 #!/bin/bash
 
+#初始文件创建
 WORK_DIR="${PWD}/tmp"
 if [ ! -d ${WORK_DIR} ];then
 	mkdir -p ${WORK_DIR}
+	mkdir -p ${PWD}/image
 fi
 
 # 源镜像文件
 ##########################################################################
-OPENWRT_VER="R20.7.20"
-KERNEL_VERSION="5.7.15-flippy-41+"
+#OPENWRT_VER="R20.7.20"
+#KERNEL_VERSION="5.7.15-flippy-41+"
 SUBVER=$1
 # Armbian
-LNX_IMG="/opt/imgs/Armbian_20.02.0_Aml-s9xxx_buster_${KERNEL_VERSION}.img"
+LNX_IMG="${PWD}/image/armbian.img"
 # Openwrt 
 OPWRT_ROOTFS_GZ="${PWD}/openwrt-armvirt-64-default-rootfs.tar.gz"
 
@@ -21,7 +23,7 @@ OPWRT_ROOTFS_GZ="${PWD}/openwrt-armvirt-64-default-rootfs.tar.gz"
 ###########################################################################
 
 # 目标镜像文件
-TGT_IMG="${WORK_DIR}/N1_Openwrt_${OPENWRT_VER}_k${KERNEL_VERSION}${SUBVER}.img"
+TGT_IMG="${WORK_DIR}/N1_Openwrt_k${KERNEL_VERSION}${SUBVER}.img"
 
 # 可选参数：是否替换n1的dtb文件 y:替换 n:不替换
 REPLACE_DTB="n"
@@ -110,6 +112,14 @@ else
 	echo "lsblk 程序不存在，请安装 util-linux"
 	exit 1
 fi
+
+echo " -----------------------------"
+echo "请输入armbian的内核版本"
+echo "例子：Armbian_20.02.0_Aml-s9xxx_buster_5.7.15-flippy-41+.img "
+echo "其中5.7.15就是内核版本，flippy-41+是修改者的名字，你可以直接输5.7.15-flippy-41+"
+echo "-----------------------------"
+
+read  -p "请在这里输入内核版本：" KERNEL_VERSION
 
 # work dir
 cd $WORK_DIR
@@ -250,7 +260,7 @@ fi
 [ -f $FLIPPY ] && cp $FLIPPY usr/sbin/
 if [ -f $BANNER ];then
     cp -f $BANNER etc/banner
-    echo " Base on OpenWrt ${OPENWRT_VER} by lean & lienol" >> etc/banner
+    #echo " Base on OpenWrt ${OPENWRT_VER} by lean & lienol" >> etc/banner
     echo " Kernel ${KERNEL_VERSION}" >> etc/banner
     TODAY=$(date +%Y-%m-%d)
     echo " Packaged by flippy on $TODAY" >> etc/banner
