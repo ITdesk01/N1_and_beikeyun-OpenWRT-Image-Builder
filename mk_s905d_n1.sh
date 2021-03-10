@@ -23,7 +23,7 @@ BOARD=n1
 SUBVER=$1
 
 # Armbian 源文件
-LNX_IMG="/opt/imgs/Armbian_20.10_Aml-s9xxx_buster_${KERNEL_VERSION}.img"
+LNX_IMG="Armbian_20.10_Aml-s9xxx_buster_${KERNEL_VERSION}.img"
 # not used
 # BOOT_TGZ="/opt/kernel/boot-${KERNEL_VERSION}.tar.gz"
 # MODULES_TGZ="/opt/kernel/modules-${KERNEL_VERSION}.tar.gz"
