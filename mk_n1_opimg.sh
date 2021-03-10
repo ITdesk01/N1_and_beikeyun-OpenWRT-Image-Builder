@@ -98,7 +98,7 @@ echo "-----------------------------"
 
 read  -p "请在这里输入内核版本：" KERNEL_VERSION
 # 目标镜像文件
-TGT_IMG="${WORK_DIR}/N1_Openwrt_k${KERNEL_VERSION}${SUBVER}.img"
+TGT_IMG="${WORK_DIR}/N1_Openwrt_${KERNEL_VERSION}${SUBVER}.img"
 
 # work dir
 cd $WORK_DIR
