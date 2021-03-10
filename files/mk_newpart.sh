@@ -47,7 +47,7 @@ echo
 echo "create rootfs2 filesystem ... "
 case $TARGET_ROOTFS2_FSTYPE in
 	xfs) mkfs.xfs -f -L EMMC_ROOTFS2 /dev/${DEV}p3;;
-      btrfs) mkfs.btrfs -f -L EMMC_ROOTFS2 -m single /dev/${DEV}p3;; 
+      btrfs) mkfs.btrfs -f -L EMMC_ROOTFS2 /dev/${DEV}p3;; 
 	  *) mkfs.ext4 -F -L EMMC_ROOTFS2  /dev/${DEV}p3;;
 esac
 echo "done"

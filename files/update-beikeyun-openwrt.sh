@@ -185,7 +185,7 @@ COPY_SRC="root etc bin sbin lib opt usr www"
 echo "copy data ... "
 for src in $COPY_SRC;do
 	echo -n "copy $src ... "
-        (cd ${P2} && tar cf - $src) | tar xf -
+        (cd ${P2} && tar cf - $src) | tar mxf -
         sync
         echo "done"
 done
@@ -239,6 +239,14 @@ if [ $BR_FLAG -eq 1 ];then
 fi
 
 echo "Now modify config files ... "
+if [ -x ./usr/sbin/balethirq.pl ];then
+    if grep "balethirq.pl" "./etc/rc.local";then
+	echo "balance irq is enabled"
+    else
+	echo "enable balance irq"
+        sed -e "/exit/i\/usr/sbin/balethirq.pl" -i ./etc/rc.local
+    fi
+fi
 rm -f "./etc/rc.local.orig" "./usr/bin/mk_newpart.sh" "./etc/part_size"
 rm -rf "./opt/docker" && ln -sf "/mnt/mmcblk0p4/docker" "./opt/docker"
 cat > ./etc/fstab <<EOF
@@ -306,7 +314,7 @@ echo -n "remove old boot files ..."
 rm -rf *
 echo "done"
 echo -n "copy new boot files ... " 
-(cd ${P1} && tar cf - . ) | tar xf -
+(cd ${P1} && tar cf - . ) | tar mxf -
 sync
 echo "done"
 echo
@@ -320,7 +328,7 @@ rootfstype=btrfs
 rootflags=compress=zstd
 extraargs=usbcore.autosuspend=-1
 extraboardargs=
-fdtfile=rk3328-beikeyun-1296mhz.dtb
+fdtfile=/dtb/rockchip/rk3328-beikeyun-1296mhz.dtb
 EOF
 sync
 echo "done"

@@ -24,15 +24,21 @@ sub get_soc_temp {
 sub get_cpu_freq {
     my @fnames=(
            '/sys/devices/system/cpu/cpufreq/policy0/cpuinfo_cur_freq',
-       );
+           '/sys/devices/system/cpu/cpufreq/policy1/cpuinfo_cur_freq',
+           '/sys/devices/system/cpu/cpufreq/policy2/cpuinfo_cur_freq',
+    );
+
     my $fh;
-    my $freq = "Unknown";
+    my $freq = "";
     for my $fname (@fnames) {
         if( -f $fname ) {
             open $fh, "<", $fname;
-            $freq = sprintf "%dMhz", <$fh> / 1000;
+	    if($freq eq "") {
+               $freq = sprintf "%dMhz", <$fh> / 1000;
+    	    } else {
+               $freq = sprintf "(%s & %dMhz)", $freq, <$fh> / 1000;
+	    }
 	    close $fh;
-	    return $freq;
         }
     }
     return $freq;

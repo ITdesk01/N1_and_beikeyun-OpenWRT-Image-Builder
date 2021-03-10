@@ -2,7 +2,6 @@
 
 # EMMC DEVICE MAJOR
 DST_MAJ=179
-DTB_FILE="meson-gxl-s905d-phicomm-n1.dtb"
 
 DST_NAME=$(lsblk -l -b -I $DST_MAJ -o NAME,MAJ:MIN,SIZE | grep "${DST_MAJ}:0" | awk '{print $1}')
 DST_SIZE=$(lsblk -l -b -I $DST_MAJ -o NAME,MAJ:MIN,SIZE | grep "${DST_MAJ}:0" | awk '{print $3}')
@@ -316,14 +315,23 @@ echo "edit done"
 echo
 	
 cd /mnt/${DST_NAME}p2
+if [ -x ./usr/sbin/balethirq.pl ];then
+    if grep "balethirq.pl" "./etc/rc.local";then
+	echo "balance irq is enabled"
+    else
+	echo "enable balance irq"
+        sed -e "/exit/i\/usr/sbin/balethirq.pl" -i ./etc/rc.local
+    fi
+fi
+
 if [ $BR_FLAG -eq 1 ];then
     #[ -f /etc/config/passwall_rule/chnroute ] && cp /etc/config/passwall_rule/chnroute ./etc/config/passwall_rule/ 2>/dev/null
     #[ -f /etc/config/passwall_rule/gfwlist.conf ] && cp /etc/config/passwall_rule/gfwlist.conf ./etc/config/passwall_rule/ 2>/dev/null
     cp /etc/config/luci ./etc/config/
     sync
 fi
-eval tar czf .reserved/openwrt_config.tar.gz "${BACKUP_LIST}" 2>/dev/null
 
+eval tar czf .reserved/openwrt_config.tar.gz "${BACKUP_LIST}" 2>/dev/null
 sync
 cd /
 umount -f /mnt/${DST_NAME}p2
@@ -379,20 +387,15 @@ echo
 
 echo -n "Write uEnv.txt ... "
 cd /mnt/${DST_NAME}p1
-cat > uEnv.txt <<EOF
-LINUX=/zImage
-INITRD=/uInitrd
-FDT=/dtb/amlogic/${DTB_FILE}
+lines=$(wc -l < /boot/uEnv.txt)
+lines=$((lines-1))
+head -n $lines /boot/uEnv.txt > uEnv.txt
+cat >> uEnv.txt <<EOF
 APPEND=root=UUID=${ROOTFS_UUID} rootfstype=btrfs rootflags=compress=zstd console=ttyAML0,115200n8 console=tty0 no_console_suspend consoleblank=0 fsck.fix=yes fsck.repair=yes net.ifnames=0 cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory swapaccount=1
 EOF
 
-# 旧版本: Armbian 5.9x - 19.11.x
-# echo -n "Write uEnv.ini ... "
-#dtb_name=/dtb/amlogic/${DTB_FILE}
-#bootargs=root=UUID=${ROOTFS_UUID} rootfstype=btrfs rootflags=compress=zstd console=ttyAML0,115200n8 console=tty0 no_console_suspend consoleblank=0 fsck.fix=yes fsck.repair=yes net.ifnames=0 cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory swapaccount=1
-#EOF
-
 rm -f s905_autoscript* aml_autoscript*
+sync
 echo "done."
 echo
 

@@ -1,12 +1,11 @@
 #!/bin/sh
 
 # you can change this size >= 72
-TARGET_BOOT_SIZE_MB=128
+TARGET_BOOT_SIZE_MB=160
 # you can change this size >= 320
-TARGET_ROOTFS_SIZE_MB=512
+TARGET_ROOTFS_SIZE_MB=720
 # shared partition can be ext4, xfs, btrfs
 TARGET_SHARED_FSTYPE=btrfs
-DTB_FILE="meson-gxl-s905d-phicomm-n1.dtb"
 
 # EMMC DEVICE MAJOR
 DST_MAJ=179
@@ -100,7 +99,8 @@ while [ $p -ge 1 ];do
 done
 
 # Create new partition
-SKIP_MB=700
+#SKIP_MB=700
+SKIP_MB=68
 DST_TOTAL_MB=$((DST_SIZE/1024/1024))
 
 start1=$(( SKIP_MB * 2048 ))
@@ -217,20 +217,13 @@ while [ $i -le $max_try ]; do
 		sync
 		echo "done"
 		echo -n "Write uEnv.txt ... "
-		cat > uEnv.txt <<EOF
-LINUX=/zImage
-INITRD=/uInitrd
-FDT=/dtb/amlogic/${DTB_FILE}
-APPEND=root=UUID=${ROOTFS_UUID} rootfstype=btrfs rootflags=compress=zstd console=ttyAML0,115200n8 c
-onsole=tty0 no_console_suspend consoleblank=0 fsck.fix=yes fsck.repair=yes net.ifnames=0 cgroup_ena
-ble=cpuset cgroup_memory=1 cgroup_enable=memory swapaccount=1
+		lines=$(wc -l < /boot/uEnv.txt)
+		lines=$((lines-1))
+		head -n $lines /boot/uEnv.txt > uEnv.txt
+		cat >> uEnv.txt <<EOF
+APPEND=root=UUID=${ROOTFS_UUID} rootfstype=btrfs rootflags=compress=zstd console=ttyAML0,115200n8 console=tty0 no_console_suspend consoleblank=0 fsck.fix=yes fsck.repair=yes net.ifnames=0 cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory swapaccount=1
 EOF
 
-# 旧版本
-		#cat > uEnv.ini <<EOF
-#dtb_name=/dtb/amlogic/${DTB_FILE}
-#bootargs=root=UUID=${ROOTFS_UUID} rootfstype=btrfs rootflags=compress=zstd console=ttyAML0,115200n8 console=tty0 no_console_suspend consoleblank=0 fsck.fix=yes fsck.repair=yes net.ifnames=0 cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory swapaccount=1
-#EOF
 		rm -f s905_autoscript* aml_autoscript*
 		sync
 		echo "done."
@@ -269,7 +262,7 @@ while [ $i -le $max_try ]; do
 		echo "copy data ... "
 		for src in $COPY_SRC;do
 			echo -n "copy $src ... "
-			(cd / && tar cf - $src) | tar xf -
+			(cd / && tar cf - $src) | tar mxf -
 			sync
 			echo "done"
 		done
